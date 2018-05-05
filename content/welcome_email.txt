@@ -1,0 +1,51 @@
+Here are your AWS master account login credentials.
+
+Login URL:
+{{aws_console_login_url}}
+
+Username:
+{{iam_username}}
+
+Temporary Password:
+Click the following link to reveal your password.  The link will work only once.
+{{pw}}
+
+You will be prompted to change your password upon login.  Your password must have the following criteria:
+Minimum of {{pw_policy.MinimumPasswordLength}} characters
+{{#if pw_policy.RequireSymbols}}
+Must contain at least 1 special character
+{{/if}}
+{{#if pw_policy.RequireNumbers}}
+Must contain at least one number
+{{/if}}
+{{#if pw_policy.RequireUppercaseCharacters}}
+Must contain at least one upper case character
+{{/if}}
+{{#if pw_policy.RequireLowercaseCharacters}}
+Must contain at least one lower case character
+{{/if}}
+
+You will need to setup MFA on your account.  Without doing this you will not have access to do anything in AWS apart from configure MFA.  To setup MFA, click the edit icon next to "Assigned MFA device" on the Security Credentials tab of your IAM user:
+https://console.aws.amazon.com/iam/home#/users/{{iam_username}}?section=security_credentials
+
+You will need to download a virtual authenticator such as Authy or Google Authenticator which are available in the iOS App Store or Google Play.  Authy is the recommended choice.
+
+Note: After setting up MFA you may need to log out and log back into the AWS web console in order to change roles.
+
+For more information on how to setup MFA, see:
+http://docs.aws.amazon.com/IAM/latest/UserGuide/id_credentials_mfa_enable_virtual.html
+
+{{#if roles}}
+Your master account user has cross account roles which allow access to our AWS accounts for our other environments.  Once you log into AWS with your master account credentials, you can then assume the roles you were given access to, in order to access the other AWS environments.  Use the below links to access the other AWS environments.
+
+{{#each roles}}
+{{env_name}}
+Assume Role URL:
+{{assume_role_url}}
+{{/each}}
+
+To assume these roles with the command line or from code, follow these instructions:
+{{/if}}
+
+Generation of your IAM user and this email were automated, source code located here:
+https://github.com/billtrust/aws-iam-user-tool

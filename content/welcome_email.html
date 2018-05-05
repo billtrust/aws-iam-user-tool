@@ -1,0 +1,139 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<meta name="viewport" content="width=device-width" />
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+<title>AWS master account login credentials.</title>
+<link href="http://mailgun.github.io/transactional-email-templates/styles.css" media="all" rel="stylesheet" type="text/css" />
+</head>
+
+<body>
+
+<table class="body-wrap">
+	<tr>
+		<td></td>
+		<td class="container" width="600">
+			<div class="content">
+				<table class="main" width="100%" cellpadding="0" cellspacing="0">
+					<tr>
+						<td class="alert alert-warning">
+							Your AWS master account login credentials.
+						</td>
+					</tr>
+					<tr>
+						<td class="content-wrap">
+							<table width="100%" cellpadding="0" cellspacing="0">
+								<tr>
+									<td class="content-block">
+										Here are your AWS master account login credentials.
+									</td>
+								</tr>
+								<tr>
+									<td class="content-block">
+										<strong>Login URL:</strong><br/>
+										{{aws_console_login_url}}
+									</td>
+								</tr>
+								<tr>
+									<td class="content-block">
+										<strong>Username:</strong><br/>
+										{{iam_username}}
+									</td>
+								</tr>
+								<tr>
+									<td class="content-block">
+										<strong>Temporary Password:</strong><br/>
+										Click the following link to reveal your password.  The link will work only once.<br/>
+										{{pw}}
+									</td>
+								</tr>
+								<tr>
+									<td class="content-block">
+										You will be prompted to change your password upon login.  Your password must have the following criteria:<br/>
+										<ul>
+										<li>Minimum of {{pw_policy.MinimumPasswordLength}} characters</li>
+										{{#if pw_policy.RequireSymbols}}
+										<li>Must contain at least 1 special character</li>
+										{{/if}}
+										{{#if pw_policy.RequireNumbers}}
+										<li>Must contain at least one number</li>
+										{{/if}}
+										{{#if pw_policy.RequireUppercaseCharacters}}
+										<li>Must contain at least one upper case character</li>
+										{{/if}}
+										{{#if pw_policy.RequireLowercaseCharacters}}
+										<li>Must contain at least one lower case character</li>
+										{{/if}}
+										</ul>
+									</td>
+								</tr>
+								<tr>
+									<td class="content-block">
+										You will need to setup MFA on your account.  Without doing this you will not have access to do anything in AWS apart from configure MFA.  To setup MFA, click the edit icon next to "Assigned MFA device" on the Security Credentials tab of your IAM user:<br/>
+										https://console.aws.amazon.com/iam/home#/users/{{iam_username}}?section=security_credentials<br/>
+										<br/>
+										You will need to download a virtual authenticator such as <a href="https://authy.com/">Authy</a> or <a href="https://itunes.apple.com/us/app/google-authenticator/id388497605?mt=8">Google Authenticator</a> which are available in the iOS App Store or Google Play.  Authy is the recommended choice.<br/>
+										<br/>
+										<strong>Note: After setting up MFA you may need to log out and log back into the AWS web console in order to change roles.</strong>
+										<br/>
+										For more information on how to setup MFA, see:<br/>
+										http://docs.aws.amazon.com/IAM/latest/UserGuide/id_credentials_mfa_enable_virtual.html
+									</td>
+								</tr>
+								{{#if roles}}
+								<tr>
+									<td class="content-block">
+										Your master account user has cross account roles which allow access to our AWS accounts for our other environments.  Once you log into AWS with your master account credentials, you can then assume the roles you were given access to, in order to access the other AWS environments.  Use the below links to access the other AWS environments.
+									</td>
+								</tr>
+
+								{{#each roles}}
+								<tr>
+									<td class="content-block">
+										<strong>{{env_name}}</strong><br/>
+										Assume Role URL:<br/>
+										{{assume_role_url}}<br/>
+									</td>
+								</tr>
+								{{/each}}
+
+								<tr>
+									<td class="content-block">
+										Once you use the above links to initially assume the role, you can switch back and forth between roles in the account menu in the upper right hand corner of the console.<br/>
+										<img src="https://media.amazonwebservices.com/blog/2015/aws_console_multiple_roles_2.png" />
+									</td>
+								</tr>
+								<tr>
+									<td class="content-block">
+										To assume these roles with the command line or from code, follow these instructions:<br/>
+										https://docs.aws.amazon.com/cli/latest/userguide/cli-roles.html
+									</td>
+								</tr>
+								{{/if}}
+								
+							</table>
+						</td>
+					</tr>
+				</table>
+				<div class="footer">
+					<table width="100%">
+						<tr>
+							<td class="aligncenter content-block">
+								Generation of your IAM user and this email were automated, source code located here:<br/> 
+							https://github.com/billtrust/aws-iam-user-tool
+							</td>
+						</tr>
+						<tr>
+							<td class="aligncenter content-block">
+								<img height="50" src="https://a0.awsstatic.com/main/images/logos/aws_logo_smile_1200x630.png">
+							</td>
+						</tr>
+					</table>
+				</div></div>
+		</td>
+		<td></td>
+	</tr>
+</table>
+
+</body>
+</html>
