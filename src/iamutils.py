@@ -117,7 +117,7 @@ def generate_email_template_data(
     props = {
         "aws_console_login_url": console_login_url,
         "iam_username": user_name,
-        "pw": privnote_url,
+        "encrypted_pw_url": privnote_url,
         "pw_policy": {
             "MinimumPasswordLength": password_policy['MinimumPasswordLength'],
             "RequireSymbols": password_policy['RequireSymbols'],

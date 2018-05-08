@@ -8,7 +8,7 @@ Username:
 
 Temporary Password:
 Click the following link to reveal your password.  The link will work only once.
-{{pw}}
+{{encrypted_pw_url}}
 
 You will be prompted to change your password upon login.  Your password must have the following criteria:
 Minimum of {{pw_policy.MinimumPasswordLength}} characters
