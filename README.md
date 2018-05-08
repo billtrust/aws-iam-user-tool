@@ -1,6 +1,8 @@
 # AWS IAM User Tool
 
-A command line tool to create AWS IAM users, set permissions, and send a welcome email to the newly created usr with all necessary login and usage information.
+A command line tool to create AWS IAM users, set permissions, and send a welcome email to the newly created user with all necessary login and usage information.
+
+See a [sample](http://htmlpreview.github.io/?https://github.com/billtrust/aws-iam-user-tool/blob/master/sample_email.html) of the welcome email this tool sends out when creating a new IAM user.
 
 ## Features
 
