@@ -163,7 +163,6 @@ class TestIamUtils(unittest.TestCase):
         arn = iamutils.get_iam_group_arn(self.test_iam_group_name)
         self.assertEqual(arn[0:13], "arn:aws:iam::")
         self.assertEqual(arn.split(':')[-1], "group/{}".format(self.test_iam_group_name))
-        #self.assertTrue("arn:aws:iam::951954082978:group/Administrators")
         pass
 
     def test_infer_env_name(self):

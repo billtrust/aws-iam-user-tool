@@ -28,7 +28,7 @@ def ensure_envvars():
     for required_envvar in required_envvars:
         if not os.environ.get(required_envvar, ''):
             missing_envvars.append(required_envvar)
-    
+
     if missing_envvars:
         message = "Required environment variables are missing: " + \
             repr(missing_envvars)
@@ -221,7 +221,7 @@ def get_group_attached_policy_arns(group_name):
         )
         for policy in response['AttachedPolicies']:
             policy_arns.append(policy['PolicyArn'])
-    return policy_arns        
+    return policy_arns
 
 
 def get_active_policy_document(policy_arn):
@@ -305,7 +305,7 @@ def get_cross_account_role_groupings(iam_group_names):
         arns = get_iam_group_cross_account_role_arns(group_name)
         for arn in arns:
             # if there are multiple arns in the group, use the role name
-            # else use the group name for the display name                
+            # else use the group name for the display name
             if len(arns) > 1:
                 role_name = arn.split(':')[-1].split('/')[-1]
                 display_name = role_name
@@ -359,11 +359,14 @@ def send_ses_templated_email(
         template_data
     ):
     logger.info(f"Sending {ses_template_name} email to {email_to}")
+    aws_account_id = get_aws_account_id()
+    region = os.environ["AWS_DEFAULT_REGION"]
     destinations = {
         'ToAddresses':  [ email_to ]
     }
     if email_bcc:
         destinations['BccAddresses'] = [ email_bcc ]
+
     client = boto3.client('ses')
     response = client.send_templated_email(
         Source=email_from,
@@ -371,6 +374,6 @@ def send_ses_templated_email(
         ReplyToAddresses=[ email_replyto ],
         ReturnPath=email_from,
         Template=ses_template_name,
-        TemplateArn=f"arn:aws:ses:us-east-1:951954082978:template/{ses_template_name}",
+        TemplateArn=f"arn:aws:ses:{region}:{aws_account_id}:template/{ses_template_name}",
         TemplateData=template_data
     )
