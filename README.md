@@ -73,14 +73,17 @@ You will need the following installed on your workstation to use this tool.
 
 ## Usage
 
-To create a user execute `create-user.ps1` passing arguments for the username, email, and IAM groups the user should belong to.
+To create a user execute `iamtool.py` passing arguments for the username, email, and IAM groups the user should belong to.
 
 Example:
-```
+```shell
+# make sure to build first, the image is not currently published to docker hub
+docker build -t billtrust/aws-iam-user-tool:latest .
+# iamtool.py generates AWS temp credentials and executes the tool within a container
 python ./iamtool.py \
     create \
-    --user-name test-user \
-    --user-email dkerwin@billtrust.com \
+    --user-name testuser \
+    --user-email testuser@mycompany.com \
     --iam-group master-allusers \
     --iam-group dev-developers \
     --iam-group stage-developers \
