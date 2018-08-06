@@ -7,6 +7,22 @@
 <link href="http://mailgun.github.io/transactional-email-templates/styles.css" media="all" rel="stylesheet" type="text/css" />
 </head>
 
+<style>
+pre, code {
+	font-family: monospace, monospace;
+}
+pre {
+	overflow: auto;
+}
+pre > code {
+	display: block;
+	padding: 1rem;
+	word-wrap: normal;
+	background-color: #000;
+	color: lightgray;
+}
+</style>
+
 <body>
 
 <table class="body-wrap">
@@ -74,7 +90,9 @@
 										<br/>
 										You will need to download a virtual authenticator such as <a href="https://authy.com/">Authy</a> or <a href="https://itunes.apple.com/us/app/google-authenticator/id388497605?mt=8">Google Authenticator</a> which are available in the iOS App Store or Google Play.  Authy is the recommended choice.<br/>
 										<br/>
-										<strong>Note: After setting up MFA you may need to log out and log back into the AWS web console in order to change roles.</strong>
+										<strong>Note: After setting up MFA you may need to log out and log back into the AWS web console in order to change roles.</strong><br/>
+										<br/>
+										<strong>Note: Please let your AWS administrator know after you have setup MFA if you wish to use the AWS API's (from code, from the CLI, etc).</strong>
 										<br/>
 										For more information on how to setup MFA, see:<br/>
 										http://docs.aws.amazon.com/IAM/latest/UserGuide/id_credentials_mfa_enable_virtual.html
@@ -105,7 +123,78 @@
 								</tr>
 								<tr>
 									<td class="content-block">
-										To assume these roles with the command line or from code, follow these instructions:<br/>
+										To assume these roles with the command line or from code, you will need to setup access keys for your
+										master account user and configure the AWS CLI for your terminal.<br/>
+										<br/>
+										<b><u>Generate Access Keys</u></b>
+										<br/>
+										To generate access keys for your AWS master account, first go to the Security Credential tab
+										of your IAM user:<br/>
+										https://console.aws.amazon.com/iam/home#/users/{{iam_username}}?section=security_credentials<br/>
+										<br/>
+										Click <i>Create Access Key</i> to generate an access and secret key.<br/>
+										<br/>
+										<b><u>Install the AWS CLI</u></b><br/>
+										If you have Python and Pip installed the easiest way will be from a command prompt:<br/>
+										<pre>
+										<code>$ pip install awscli --upgrade --user</code>
+										</pre>
+										For other installation options, see:<br/>
+										https://docs.aws.amazon.com/cli/latest/userguide/installing.html<br/>
+										<br/>
+										<b><u>Configuring your AWS Profile</u></b>
+										<br/>
+										<pre>
+										<code>$ aws configure --profile {{iam_username}}</code>
+										</pre>
+Then follow the prompts to enter the below information.<br/>
+<br/>
+<pre>
+<code>AWS Access Key ID [None]: (your access key from the earlier step)
+AWS Secret Access Key [None]: (your secret key from the earlier step)
+Default region name [None]: {{region}}
+Default output format [None]: json</code>
+</pre>
+Once you have configured your access and secret key for your master account with the AWS CLI,
+please do not store these keys anywhere else.  You can always view the values again
+by viewing the file <b>~/.aws/credentials</b>.  Your master account credentials are used only to assume the
+cross account roles.  To configure your cross account roles, open <b>~/.aws/config</b> in
+a text editor and add the following section:<br/>
+<br/>
+<pre>
+<code>{{#each roles}}[profile {{env_prefix}}]
+role_arn = {{role_arn}}
+source_profile = {{iam_username}}
+output = json
+region = {{region}}
+{{/each}}</code>
+</pre>
+<b><u>Testing</u></b><br/>
+You can test your credentials by attempting to use the AWS CLI from your terminal.<br/>
+<br/>
+<pre>
+<code>$ aws sts assume-role \
+	--role-arn {{example_role_arn}} \
+	--role-session-name testing \
+	--profile {{iam_username}}</code>
+</pre>
+Successful output of that command will look something like the following, and indicates that you are able to assume the role with your master account user.<br/>
+<br/>
+<pre>
+<code>{
+  "AssumedRoleUser": {
+    "AssumedRoleId": "AROASOMETHINGSOMETHING:testing", 
+    "Arn": "{{example_role_arn}}"
+  },
+  "Credentials": {
+    "SecretAccessKey": "blahcu43kl34blaHlhfdlsubaljucla", 
+    "SessionToken": "biglongstringhere=", 
+    "Expiration": "", 
+    "AccessKeyId": "ASIASOMETHINGSOMETHING"
+  }
+}</code>
+</pre>
+										For additional information regarding this process, see:<br/>
 										https://docs.aws.amazon.com/cli/latest/userguide/cli-roles.html
 									</td>
 								</tr>

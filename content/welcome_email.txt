@@ -44,7 +44,74 @@ Assume Role URL:
 {{assume_role_url}}
 {{/each}}
 
-To assume these roles with the command line or from code, follow these instructions:
+To assume these roles with the command line or from code, you will need to setup access keys for your
+master account user and configure the AWS CLI for your terminal.
+
+Generate Access Keys
+
+To generate access keys for your AWS master account, first go to the Security Credential tab
+of your IAM user:
+https://console.aws.amazon.com/iam/home#/users/{{iam_username}}?section=security_credentials
+
+Click "Create Access Key" to generate an access and secret key.
+
+Install the AWS CLI
+
+If you have Python and Pip installed the easiest way will be from a command prompt:
+
+$ pip install awscli --upgrade --user
+
+For other installation options, see:
+https://docs.aws.amazon.com/cli/latest/userguide/installing.html
+
+Configuring your AWS Profile
+
+$ aws configure --profile {{iam_username}}
+
+Then follow the prompts to enter the below information.
+
+AWS Access Key ID [None]: (your access key from the earlier step)
+AWS Secret Access Key [None]: (your secret key from the earlier step)
+Default region name [None]: {{region}}
+Default output format [None]: json
+
+
+Once you have configured your access and secret key for your master account with the AWS CLI,
+please do not store these keys anywhere else.  You can always view the values again
+by viewing the file ~/.aws/credentials.  Your master account credentials are used only to assume the
+cross account roles.  To configure your cross account roles, open ~/.aws/config in
+a text editor and add the following section:
+
+{{#each roles}}
+[profile {{env_prefix}}]
+role_arn = {{role_arn}}
+source_profile = {{iam_username}}
+output = json
+region = {{region}}
+{{/each}}
+
+Testing
+You can test your credentials by attempting to use the AWS CLI from your terminal.
+
+$ aws sts assume-role \
+	--role-arn {{example_role_arn}} \
+	--role-session-name testing \
+	--profile {{iam_username}}
+
+Successful output of that command will look something like the following, and indicates that you are able to assume the role with your master account user.
+
+{
+  "AssumedRoleUser": {
+    "AssumedRoleId": "AROASOMETHINGSOMETHING:testing", 
+    "Arn": "{{example_role_arn}}"
+  },
+  "Credentials": {
+    "SecretAccessKey": "blahcu43kl34blaHlhfdlsubaljucla", 
+    "SessionToken": "biglongstringhere=", 
+    "Expiration": "", 
+    "AccessKeyId": "ASIASOMETHINGSOMETHING"
+  }
+}
 {{/if}}
 
 Generation of your IAM user and this email were automated, source code located here:

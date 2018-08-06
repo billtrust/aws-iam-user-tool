@@ -15,7 +15,6 @@ logger = logging.getLogger(__name__)
 def get_aws_account_id():
     return boto3.client('sts').get_caller_identity()['Account']
 
-
 def ensure_envvars():
     """Ensure that these environment variables are provided at runtime"""
     required_envvars = [
@@ -66,12 +65,22 @@ def provision_user(user_name, group_names, user_email, ses_email_template_name):
     password_policy = get_password_policy()
     cross_account_groups = get_cross_account_role_groupings(group_names)
     console_login_url = get_console_login_url()
+    aws_account_id = get_aws_account_id()
+    # not perfect, but region is not part of iam resources so there is no way
+    # to know the default region of an IAM role or account.  best assumption
+    # to make is to use the current region iam user tool is running from.
+    region = os.environ['AWS_DEFAULT_REGION']
+    # because the email template needs a single variable (can't seem to {{role[0]}})
+    example_role_arn = cross_account_groups[0]['role_arn']
     props = generate_email_template_data(
         user_name,
         privnote_url,
         password_policy,
         cross_account_groups,
-        console_login_url)
+        console_login_url,
+        aws_account_id,
+        region,
+        example_role_arn)
 
     # send the email
     send_ses_templated_email(
@@ -113,7 +122,8 @@ def get_email_config(id='EMAIL_CONFIG'):
 
 
 def generate_email_template_data(
-        user_name, privnote_url, password_policy, cross_account_groups, console_login_url):
+        user_name, privnote_url, password_policy, cross_account_groups, console_login_url,
+        aws_account_id, region, example_role_arn):
     props = {
         "aws_console_login_url": console_login_url,
         "iam_username": user_name,
@@ -125,7 +135,10 @@ def generate_email_template_data(
             "RequireUppercaseCharacters": password_policy['RequireUppercaseCharacters'],
             "RequireLowercaseCharacters": password_policy['RequireLowercaseCharacters']
         },
-        "roles": cross_account_groups
+        "roles": cross_account_groups,
+        "aws_account_id": aws_account_id,
+        "region": region,
+        "example_role_arn": example_role_arn
     }
     logger.debug("Email template data: " + str(props))
     return props
@@ -313,7 +326,10 @@ def get_cross_account_role_groupings(iam_group_names):
                 display_name = group_name
             cross_account_groups.append({
                 'assume_role_url': build_switch_role_url(arn, display_name),
-                'env_name': group_name
+                'role_arn': arn,
+                'region': os.environ['AWS_DEFAULT_REGION'],
+                'env_name': group_name,
+                'env_prefix': group_name.split('-')[0]
                 }
             )
     return cross_account_groups
