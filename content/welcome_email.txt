@@ -1,4 +1,4 @@
-Here are your AWS master account login credentials.
+Here are your AWS master account login credentials.  Do NOT delete this email, you may need to reference information contained here in the future.
 
 Login URL:
 {{aws_console_login_url}}
